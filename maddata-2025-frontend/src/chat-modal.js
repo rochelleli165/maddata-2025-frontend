@@ -37,8 +37,24 @@ async function generateText(prompt) {
     try {
 
       const params = new URLSearchParams({ question: inputText });
-      generateText(inputText).then(story => {
-        console.log(story);
+      generateText(inputText + "Please surround the code with [[[ and ]]] tags and the explanation with <<< and >>> tags. Do not generate anything else.").then(story => {
+        //console.log(story);
+
+        // parse out code and explanation 
+        const regex_code = /\[\[\[(.*?)\]\]\]/s;
+        const regex_expl = /\<\<\<(.*?)\>\>\>/s;
+        const code_match = story.match(regex_code);
+        const expl_match = story.match(regex_expl);
+        if (code_match && code_match[1]) {
+          console.log("Code: ", code_match[1]);
+        }
+        if (expl_match && expl_match[1]) {
+          console.log("Explanation: ", expl_match[1]);
+        }
+
+        // const code = story.match(/\[\[\[(.*?)\]\]\]/);
+        // const explanation = story.match(/<<<(.*?)>>>/);
+        // print out code to log 
         
         setHistory(
             `{'role': 'user', content: ${inputText} }, {'role': 'asisstant', content: ${story}}`
