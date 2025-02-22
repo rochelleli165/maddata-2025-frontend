@@ -1,29 +1,45 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import p5 from "p5";
 
-const P5Wrapper = ({ scriptContent}) => {
+const P5Wrapper = ({ scriptContent, container_id}) => {
+  const containerRef = useRef(null);
+  let p5Instance = useRef(null);
+
   useEffect(() => {
-    const script = document.createElement("script");
-    //let interText = scriptContent.replace(/```\s*|\s*```/g, "");
-    //let cleanText = interText.replace(/javascript\s*|\s*/g, "");
+    if (!scriptContent || !containerRef.current) return;
+
+    const containerElement = document.getElementById(container_id);
+
+    if (!containerElement) {
+      console.error(`Container element with id ${container_id} not found!`);
+      return;
+    }
+  
     let cleanText = scriptContent.replace(/```javascript|```/g, '');
-    script.innerHTML = `${cleanText}`;
-
-    //script.src = "./script.js"; // Ensure this path is correct
-    console.log("Script content: ", cleanText);
-    script.async = true;
-    script.onload = () => {
-      console.log("Script loaded");
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script); // Cleanup script on unmount
-    };
-
     
+    let wrappedScript = `
+     
+        ${cleanText
+          .replace(/canvas.parent\('p5-container'\)/g, `canvas.parent(containerRef.current)`) // Use containerRef)
+          .replace(/canvas.parent\("p5-container"\)/g, `canvas.parent(containerRef.current)`) // Use containerRef)
+        }
+      
+    `;
+    try {
 
-  }, []);
-  return <div id="p5-container"></div>;
+      if (p5Instance.current) {
+        p5Instance.current.remove();
+      }
+      console.log(wrappedScript);
+      const sketchFunction = eval(wrappedScript); // Convert script string into function
+      console.log('container ref current' + containerRef.current);
+      p5Instance.current = new p5(sketchFunction, containerRef.current);
+    } catch (error) {
+      console.error("Error executing p5.js code:", error);
+    }
+
+  }, [scriptContent, container_id]);
+  return <div ref={containerRef} id={container_id} style={{ width: "400px", height: "400px" }}></div>;
 };
 
 export default P5Wrapper;
