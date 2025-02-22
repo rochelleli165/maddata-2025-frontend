@@ -5,6 +5,7 @@ import { useState } from "react";
 import React from "react";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import P5Wrapper from "./p5-sketch";
     
 const genAI = new GoogleGenerativeAI("AIzaSyDPvEGpuaIgytJiK0cgAjUpuRTEOKvVPJg"); // Replace YOUR_API_KEY with your actual API key
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -52,6 +53,8 @@ async function generateText(prompt) {
           console.log("Explanation: ", expl_match[1]);
         }
 
+        
+
         // const code = story.match(/\[\[\[(.*?)\]\]\]/);
         // const explanation = story.match(/<<<(.*?)>>>/);
         // print out code to log 
@@ -62,12 +65,10 @@ async function generateText(prompt) {
         setChatHistory([
             ...chatHistory,
             { sender: "user", message: inputText },
-            { sender: "chatbot", message: story },
+            { sender: "chatbot-code", message: code_match[1] },
+            { sender: "chatbot-explanation", message: expl_match[1] }
           ]);
      });
-
-    
-     
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -77,8 +78,8 @@ async function generateText(prompt) {
     <main>
       <div className="chat-window">
         {chatHistory.map((msg, index) => (
-          <div key={index} className={`message ${msg.sender}`}>
-             <h1>{msg.message}</h1>
+          <div >
+            <CodeOrExplanationComponent sender={msg.sender} message={msg.message} ></CodeOrExplanationComponent>;
           </div>
         ))}
       </div>
@@ -95,5 +96,17 @@ async function generateText(prompt) {
     </main>
   );
 };
+
+function CodeOrExplanationComponent({sender, message}) {
+    if (sender === "chatbot-code") {
+        return <div>
+            <p>Code:</p>
+            <P5Wrapper scriptContent={message}></P5Wrapper>
+            </div>;
+    }
+    else {
+        return <p>{message}</p>
+    }
+}
 
 export default ChatModal;
