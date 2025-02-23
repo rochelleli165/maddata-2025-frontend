@@ -91,6 +91,8 @@ async function generateText(prompt) {
           </div>
         ))}
       </div>
+
+      <div className="input-container">
       <form onSubmit={handleSubmit} className="form">
         <input
           placeholder="Type your message..."
@@ -99,8 +101,9 @@ async function generateText(prompt) {
           onChange={handleInputChange}
         />
         <div style={{paddingBottom:'8px'}}></div>
-        <button>Submit</button>
+        <button className="submit-button">Submit</button>
       </form>
+      </div>
     </main>
   );
 };
