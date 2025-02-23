@@ -16,12 +16,13 @@ main {
   display: flex;
   flex-direction: column;
   height: 100vh; /* Full screen height */
+  align-items: center;
 } 
 
 .chat-window {
   flex-grow: 1; /* Pushes input to the bottom */
   overflow-y: auto; /* Enables scrolling if needed */
-  padding: 80px;
+  width: 75%;
 }
 
 .input-container {

@@ -25,23 +25,20 @@ const P5Wrapper = ({ scriptContent, container_id}) => {
         }
       
     `;
-
- 
     try {
 
       if (p5Instance.current) {
         p5Instance.current.remove();
       }
-      console.log(wrappedScript);
       const sketchFunction = eval(wrappedScript); // Convert script string into function
-      console.log('container ref current' + containerRef.current);
+
       p5Instance.current = new p5(sketchFunction, containerRef.current);
     } catch (error) {
       console.error("Error executing p5.js code:", error);
     }
 
   }, [scriptContent, container_id]);
-  return <div ref={containerRef} id={container_id} style={{ width: "400px", height: "400px" }}></div>;
+  return <div ref={containerRef} id={container_id} style={{ width: "400px", height: "400px", borderRadius: "16px" }}></div>;
 };
 
 export default P5Wrapper;
