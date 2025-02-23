@@ -10,4 +10,54 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+} 
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full screen height */
+} 
+
+.chat-window {
+  flex-grow: 1; /* Pushes input to the bottom */
+  overflow-y: auto; /* Enables scrolling if needed */
+  padding: 80px;
 }
+
+.input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: white; /* Optional background */
+  width: 100%;
+  position: fixed;
+  bottom: 0; /* Sticks to bottom */
+  left: 0;
+  border-top: 1px solid #ccc; /* Adds separation */
+}
+
+.chat-input {
+  flex-grow: 1; /* Takes up available space */
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-right: 10px; /* Adds spacing between input & button */
+}
+
+.submit-button {
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0; /* Prevents button from shrinking */
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+

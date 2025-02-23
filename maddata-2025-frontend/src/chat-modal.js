@@ -88,10 +88,12 @@ async function generateText(prompt) {
       <div className="chat-window">
         {chatHistory.map((msg, index) => (
           <div key={index}>
-            <CodeOrExplanationComponent sender={msg.sender} message={msg.message} ></CodeOrExplanationComponent>;
+            <CodeOrExplanationComponent sender={msg.sender} message={msg.message} ></CodeOrExplanationComponent>
           </div>
         ))}
       </div>
+
+      <div className="input-container">
       <form onSubmit={handleSubmit} className="form">
         <input
           placeholder="Type your message..."
@@ -100,8 +102,9 @@ async function generateText(prompt) {
           onChange={handleInputChange}
         />
         <div style={{paddingBottom:'8px'}}></div>
-        <button>Submit</button>
+        <button className="submit-button">Submit</button>
       </form>
+      </div>
     </main>
   );
 };
@@ -124,7 +127,6 @@ function CodeOrExplanationComponent({sender, message}) {
               x += 1; // Move the circle
             }`;
         return <div>
-            <p>Code:</p>
             <P5Wrapper scriptContent={message} container_id={container_id}></P5Wrapper>
             </div>;
     }
