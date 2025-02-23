@@ -1,0 +1,652 @@
+{
+  "messages": [
+      {
+        "role": "user",
+        "content": "I don't understand the difference between how objects interact continuously in gravity but different in fluids."
+      }
+      {
+        "role": "assistant",
+        "content": "First, I need to recall how physics simulations work. Gravity is a constant force applied every frame. In the code, gravity is a vector added each time in the draw loop. The force is proportional to mass, so F = mg, leading to acceleration g for all objects, since a = F/m = mg/m = g. So even though heavier objects have more force, their acceleration remains the same. That's why all movers fall at the same rate in gravity.
+
+Then there's the fluid (liquid) part. The fluid applies a drag force, which depends on velocity. The code calculates drag as proportional to the square of the speed. Drag opposes the motion, so it's in the opposite direction of velocity. Importantly, this force is only applied when the mover is inside the liquid. That's why the effect isn't continuous—only when the object is in the liquid region.
+
+The user might be mixing up continuous application versus conditional. Gravity is always on, but drag is only when inside the liquid. Also, the nature of the forces: gravity is constant acceleration, while drag is velocity-dependent, creating a different interaction. Heavier objects have more inertia, so drag affects them differently. For example, in the code, drag force magnitude is calculated using the mover's velocity, but when applying F=ma, the acceleration due to drag would be F/m, so lighter objects decelerate more quickly.
+      // Declare array to store the moving bodies 
+let movers = []; 
+
+// Declare variable for the Liquid object
+let liquid;
+
+function setup() {
+  createCanvas(720, 400);
+  colorMode(HSB, 9, 100, 100);
+  initializeMovers();
+
+  // Create Liquid object
+  liquid = new Liquid(0, height / 2, width, height / 2, 0.1);
+
+  describe(
+    'Nine grey balls drop from the top of the canvas and slow down as they reach the bottom half of the canvas.'
+  );
+}
+
+function draw() {
+  background(20);
+
+  // Draw water
+  liquid.display();
+
+  for (let mover of movers) {
+    // Check whether the mover is in the liquid
+    if (liquid.contains(mover)) {
+      // Calculate drag force
+      let dragForce = liquid.calculateDrag(mover);
+
+      // Apply drag force to Mover
+      mover.applyForce(dragForce);
+    }
+
+    // Gravitational force is proportional to the mass
+    let gravity = createVector(0, 0.1 * mover.mass);
+
+    // Apply gravitational force
+    mover.applyForce(gravity);
+
+    // Update and display
+    mover.update();
+    mover.display();
+    mover.checkEdges();
+  }
+}
+
+function mousePressed() {
+  initializeMovers();
+}
+
+function initializeMovers() {
+  // Calculate the spacing based on the width of the canvas
+  let xSpacing = width / 9;
+
+  // Fill the movers array with 9 Mover objects with random masses
+  for (let i = 0; i < 9; i += 1) {
+    let mass = random(0.5, 3);
+    let xPosition = xSpacing * i + xSpacing / 2;
+    movers[i] = new Mover(mass, xPosition, 0, color(i, 100, 100));
+  }
+}
+
+class Liquid {
+  constructor(x, y, w, h, c) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.c = c;
+  }
+
+  // Check whether the Mover in the Liquid
+  contains(m) {
+    let l = m.position;
+    return (
+      l.x > this.x &&
+      l.x < this.x + this.w &&
+      l.y > this.y &&
+      l.y < this.y + this.h
+    );
+  }
+
+  // Calculate drag force
+  calculateDrag(m) {
+    // The drag force magnitude is coefficient * speed squared
+    let speed = m.velocity.mag();
+    let dragMagnitude = this.c * speed * speed;
+
+    // Create the drag force vector (opposite direction of velocity)
+    let dragForce = m.velocity.copy();
+    dragForce.mult(-1);
+
+    // Scale the drag force vector to the magnitude calculated above
+    dragForce.setMag(dragMagnitude);
+
+    return dragForce;
+  }
+
+  display() {
+    noStroke();
+    fill(50);
+    rect(this.x, this.y, this.w, this.h);
+  }
+} // class Liquid
+
+class Mover {
+  constructor(m, x, y, c) {
+    this.mass = m;
+    this.position = createVector(x, y);
+    this.velocity = createVector(0, 0);
+    this.acceleration = createVector(0, 0);
+    this.color = c;
+  }
+
+  // Apply force according to Newton's 2nd law: F = M * A
+  // or A = F / M
+  applyForce(force) {
+    let f = p5.Vector.div(force, this.mass);
+    this.acceleration.add(f);
+  }
+
+  update() {
+    // Change the velocity by the acceleration
+    this.velocity.add(this.acceleration);
+
+    // Change the position by the velocity
+    this.position.add(this.velocity);
+
+    // Clear the acceleration each frame
+    this.acceleration.mult(0);
+  }
+
+  display() {
+    stroke(0);
+    strokeWeight(2);
+    fill(this.color);
+    ellipse(this.position.x, this.position.y, this.mass * 16, this.mass * 16);
+  }
+
+  // Make the balls bounce at the bottom
+  checkEdges() {
+    if (this.position.y > height - this.mass * 8) {
+      // A little dampening when hitting the bottom
+      this.velocity.y *= -0.9;
+      this.position.y = height - this.mass * 8;
+    }
+  }
+} // class Mover"
+      }
+    ],
+}
+{
+    "messages": [
+      {
+        "role": "user",
+        "content": "I need help visualizing sine and cosine graphs."
+      },
+      {
+        "role": "assistant",
+        "content":
+      },
+    ],
+  },
+  "preferred_output": [
+    {
+      "role": "assistant",
+      "content": "
+      function setup() {
+  createCanvas(800, 600);
+  background(0); // Black background
+  noFill();
+  strokeWeight(2);
+  drawAxes();
+  drawSinCos();
+}
+
+function drawAxes() {
+  stroke(0, 255, 0); // Green axes
+  let x_range = [-10, 10.3];
+  let y_range = [-1.5, 1.5];
+  let x_length = 800; // Canvas width
+  let y_length = 600; // Canvas height
+  let x_scale = x_length / (x_range[1] - x_range[0]);
+  let y_scale = y_length / (y_range[1] - y_range[0]);
+
+  // Draw x-axis
+  line(0, y_length / 2, x_length, y_length / 2);
+  // Draw y-axis
+  line(x_length / 2 - x_range[0] * x_scale, 0, x_length / 2 - x_range[0] * x_scale, y_length);
+
+  // Draw x-axis ticks and labels
+  for (let x = -10; x <= 10; x += 2) {
+    let x_pos = (x - x_range[0]) * x_scale;
+    line(x_pos, y_length / 2 - 5, x_pos, y_length / 2 + 5);
+    textAlign(CENTER, TOP);
+    fill(255);
+    noStroke();
+    text(x, x_pos, y_length / 2 + 10);
+    stroke(0,255,0);
+  }
+
+  // Draw y-axis ticks and labels
+  for (let y = -1; y <= 1; y += 1) {
+    let y_pos = y_length / 2 - y * y_scale;
+    line(x_length / 2 - x_range[0] * x_scale - 5, y_pos, x_length / 2 - x_range[0] * x_scale + 5, y_pos);
+    textAlign(RIGHT, CENTER);
+    fill(255);
+    noStroke();
+    text(y, x_length / 2 - x_range[0] * x_scale - 10, y_pos);
+    stroke(0,255,0);
+  }
+
+  // Label axes
+  textAlign(CENTER, BOTTOM);
+  fill(255);
+  noStroke();
+  text("x", x_length - 20, y_length / 2 - 5);
+  textAlign(LEFT, CENTER);
+  text("y", x_length / 2 - x_range[0] * x_scale + 10, 20);
+  stroke(0,255,0);
+}
+
+function drawSinCos() {
+  let x_range = [-10, 10.3];
+  let y_range = [-1.5, 1.5];
+  let x_length = 800;
+  let y_length = 600;
+  let x_scale = x_length / (x_range[1] - x_range[0]);
+  let y_scale = y_length / (y_range[1] - y_range[0]);
+
+  // Sin graph
+  stroke(0, 0, 255); // Blue
+  noFill(); // Ensure no fill
+  beginShape();
+  for (let x = x_range[0]; x <= x_range[1]; x += 0.01) {
+    let y = sin(x);
+    vertex((x - x_range[0]) * x_scale, y_length / 2 - y * y_scale);
+  }
+  endShape();
+
+  // Cos graph
+  stroke(255, 0, 0); // Red
+  noFill(); // Ensure no fill
+  beginShape();
+  for (let x = x_range[0]; x <= x_range[1]; x += 0.01) {
+    let y = cos(x);
+    vertex((x - x_range[0]) * x_scale, y_length / 2 - y * y_scale);
+  }
+  endShape();
+
+  // Vertical line at 2*PI
+  stroke(255, 255, 0); // Yellow
+  let tau = TWO_PI;
+  let x_pos = (tau - x_range[0]) * x_scale;
+  line(x_pos, 0, x_pos, y_length);
+
+  // Labels
+  fill(0, 0, 255);
+  noStroke();
+  textAlign(LEFT, BOTTOM);
+  text("sin(x)", ((-10)- x_range[0]) * x_scale, y_length/2 - sin(-10)*y_scale);
+  fill(255, 0, 0);
+  text("cos(x)", (0- x_range[0]) * x_scale, y_length/2 - cos(0)*y_scale);
+  fill(255);
+  textAlign(LEFT, TOP);
+  text("x=2π", x_pos + 5, y_length/2 - cos(tau)*y_scale);
+}
+      "
+    }
+  ],
+
+}
+{
+ 
+    "messages": [
+      {
+        "role": "user",
+        "content": "I have trouble understanding how pythagorean theorem works."
+      }
+    ],
+    "tools": [],
+    "parallel_tool_calls": true
+  },
+  "preferred_output": [
+    {
+      "role": "assistant",
+      "content": "function setup() {
+  createCanvas(400, 400);
+  noFill();
+  stroke(255);
+}
+
+function draw() {
+  background(0);
+
+  // Define the lengths of the two shorter sides (a and b)
+  let a = mouseX;
+  let b = mouseY;
+
+  // Ensure a and b are non-negative
+  a = max(0, a);
+  b = max(0, b);
+
+  // Calculate the hypotenuse (c) using the Pythagorean theorem
+  let c = Math.sqrt(a * a + b * b);
+
+  // Draw the right triangle
+  beginShape();
+  vertex(0, 0);
+  vertex(a, 0);
+  vertex(a, b);
+  endShape(CLOSE);
+
+  // Display the lengths of the sides
+  fill(255);
+  text("a = " + a.toFixed(2), a / 2, 20);
+  text("b = " + b.toFixed(2), a + 20, b / 2);
+  text("c = " + c.toFixed(2), a / 2, b + 20);
+
+  noFill(); //return to no fill for triangle
+}"
+    }
+  ],
+{
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "I'm unsure how the sine curve relates to the unit circle."
+      }
+    ],
+    "tools": [],
+    "parallel_tool_calls": true
+  },
+  "preferred_output": [
+    {
+      "role": "assistant",
+      "content": "
+      let tOffset = 0;
+let rate = 0.25;
+let originPoint;
+let curveStart;
+let circle;
+let dot;
+let curve;
+
+function setup() {
+  createCanvas(800, 400); // Adjust canvas size as needed
+  originPoint = createVector(-200, 0); // Adjusted for canvas
+  curveStart = createVector(-150, 0); // Adjusted for canvas
+  showAxis();
+  showCircle();
+  dot = new Dot(circle.radius);
+  curve = new Curve();
+}
+
+function draw() {
+  background(220);
+  translate(width / 2, height / 2); // Center the origin
+
+  drawAxis();
+  drawCircle();
+  dot.update();
+  dot.display();
+  curve.update();
+  curve.display();
+  drawLines();
+}
+
+function showAxis() {
+  // Logic is in drawAxis()
+}
+
+function drawAxis() {
+  stroke(0);
+  line(-300, 0, 300, 0); // x-axis
+  line(-200, -100, -200, 100); // y-axis
+  addXLabels();
+}
+
+function addXLabels() {
+  const xLabels = ["π", "2π", "3π", "4π"];
+  for (let i = 0; i < xLabels.length; i++) {
+    const xPos = -100 + 100 * i; // Adjusted spacing
+    textSize(16);
+    textAlign(CENTER, TOP);
+    text(xLabels[i], xPos, 10); // Adjusted position for labels
+  }
+}
+
+function showCircle() {
+  circle = new Circle(50); // Adjusted radius
+  circle.position.set(originPoint.x, originPoint.y);
+}
+
+function drawCircle() {
+  stroke(0);
+  noFill();
+  ellipse(circle.position.x, circle.position.y, circle.radius * 2);
+}
+
+function goAroundCircle(dt) {
+  tOffset += dt * rate;
+  let proportion = tOffset % 1;
+  let angle = proportion * TWO_PI;
+  let x = circle.radius * cos(angle) + circle.position.x;
+  let y = circle.radius * sin(angle) + circle.position.y;
+  return createVector(x, y);
+}
+
+function getLineToCircle() {
+  return [originPoint, dot.position];
+}
+
+function getLineToCurve() {
+  let x = curveStart.x + tOffset * 100; // Adjusted speed
+  let y = dot.position.y;
+  return [dot.position, createVector(x, y)];
+}
+
+function getCurve() {
+  let lastLine = curve.lines[curve.lines.length - 1];
+  let x = curveStart.x + tOffset * 100; // Adjusted speed
+  let y = dot.position.y;
+  let newLine = [createVector(lastLine[1].x, lastLine[1].y), createVector(x, y)];
+  curve.addLine(newLine);
+  return curve.lines;
+}
+
+function drawLines() {
+  stroke(0, 0, 255); // Blue
+  let lineToCircle = getLineToCircle();
+  line(lineToCircle[0].x, lineToCircle[0].y, lineToCircle[1].x, lineToCircle[1].y);
+
+  stroke(255, 255, 0, 150); // Yellow-A
+  let lineToCurve = getLineToCurve();
+  line(lineToCurve[0].x, lineToCurve[0].y, lineToCurve[1].x, lineToCurve[1].y);
+
+  stroke(255, 255, 0, 200); // Yellow-D
+  for (let i = 1; i < curve.lines.length; i++) {
+    let segment = curve.lines[i];
+    line(segment[0].x, segment[0].y, segment[1].x, segment[1].y);
+  }
+}
+
+class Circle {
+  constructor(radius) {
+    this.radius = radius;
+    this.position = createVector(0, 0);
+  }
+}
+
+class Dot {
+  constructor(radius) {
+    this.radius = 0.08 * 50; //adjust dot size relative to circle radius
+    this.position = createVector(0, 0);
+  }
+
+  update() {
+    this.position = goAroundCircle(deltaTime / 1000);
+  }
+
+  display() {
+    fill(255, 255, 0); // Yellow
+    noStroke();
+    ellipse(this.position.x, this.position.y, this.radius * 2);
+  }
+}
+
+class Curve {
+  constructor() {
+    this.lines = [[curveStart, curveStart]];
+  }
+
+  update() {
+    getCurve();
+  }
+
+  display() {
+    // Logic is in drawLines()
+  }
+
+  addLine(line) {
+    this.lines.push(line);
+  }
+}"
+    }
+  ],
+
+},
+
+{
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "What does Bubble Sort do?"
+      }
+    ],
+    "tools": [],
+    "parallel_tool_calls": true
+  },
+  "preferred_output": [
+    {
+      "role": "assistant",
+      "content": "let values = [];
+let i = 0;
+let j = 0;
+let numValues = 50; // Reduced number of values
+
+function setup() {
+  createCanvas(400, 400);
+  for (let k = 0; k < numValues; k++) {
+    values[k] = random(height);
+  }
+}
+
+function draw() {
+  background(220);
+
+  if (i < numValues) {
+    if (j < numValues - i - 1) {
+      if (values[j] > values[j + 1]) {
+        swap(values, j, j + 1);
+      }
+      j++;
+    } else {
+      j = 0;
+      i++;
+    }
+  } else {
+    noLoop();
+  }
+
+  let barWidth = width / numValues; // Calculate bar width
+
+  for (let k = 0; k < numValues; k++) {
+    stroke(0);
+    rect(k * barWidth, height - values[k], barWidth, values[k]); // Draw rectangles
+  }
+}
+
+function swap(arr, a, b) {
+  let temp = arr[a];
+  arr[a] = arr[b];
+  arr[b] = temp;
+}"
+    }
+  ],
+
+}
+{
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "How does selection sort work?"
+      }
+    ],
+    "tools": [],
+    "parallel_tool_calls": true
+  },
+  "preferred_output": [
+    {
+      "role": "assistant",
+      "content":"let values = [];
+let i = 0;
+let j = 0;
+let minIndex = 0;
+let numValues = 50;
+
+function setup() {
+  createCanvas(400, 400);
+  for (let k = 0; k < numValues; k++) {
+    values[k] = random(height);
+  }
+}
+
+function draw() {
+  background(220);
+
+  if (i < numValues - 1) {
+    if (j < numValues) {
+      if (values[j] < values[minIndex]) {
+        minIndex = j;
+      }
+      j++;
+    } else {
+      swap(values, i, minIndex);
+      i++;
+      j = i + 1;
+      minIndex = i;
+    }
+  } else {
+    noLoop();
+  }
+
+  let barWidth = width / numValues;
+
+  for (let k = 0; k < numValues; k++) {
+    stroke(0);
+    rect(k * barWidth, height - values[k], barWidth, values[k]);
+  }
+}
+
+function swap(arr, a, b) {
+  let temp = arr[a];
+  arr[a] = arr[b];
+  arr[b] = temp;
+}"
+    }
+  ],
+}
+{
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hello, can you tell me how cold San Francisco is today?"
+      }
+    ],
+    "tools": [],
+    "parallel_tool_calls": true
+  },
+  "preferred_output": [
+    {
+      "role": "assistant",
+      "content": "Today in San Francisco, it is not quite cold as expected. Morning clouds will give away to sunshine, with a high near 68°F (20°C) and a low around 57°F (14°C)."
+    }
+  ],
+  "non_preferred_output": [
+    {
+      "role": "assistant",
+      "content": "It is not particularly cold in San Francisco today."
+    }
+  ]
+}

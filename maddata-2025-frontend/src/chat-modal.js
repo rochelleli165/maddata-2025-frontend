@@ -40,8 +40,9 @@ async function generateText(prompt) {
       const params = new URLSearchParams({ question: inputText });
       generateText(inputText + 
         "Please surround the code with [[[ and ]]] tags and the explanation with <<< and >>> tags." + 
-        "it should return in the format similar to  (p) => { " +
-        `
+        "it should return in the format similar to" +
+        `(p) => { " +
+        
             let x = 50;
             let y = 50;
 
@@ -55,7 +56,8 @@ async function generateText(prompt) {
               p.ellipse(x, y, 50, 50);
               x += 1; // Move the circle
             }
-      }`
+      }
+            `
         ).then(story => {
        
 
@@ -64,9 +66,6 @@ async function generateText(prompt) {
         const regex_expl = /\<\<\<(.*?)\>\>\>/s;
         const code_match = story.match(regex_code);
         const expl_match = story.match(regex_expl);
-
-
-      
         
         setHistory(
             `{'role': 'user', content: ${inputText} }, {'role': 'asisstant', content: ${story}}`
@@ -87,8 +86,8 @@ async function generateText(prompt) {
     <main>
       <div className="chat-window">
         {chatHistory.map((msg, index) => (
-          <div key={index}>
-            <CodeOrExplanationComponent sender={msg.sender} message={msg.message} ></CodeOrExplanationComponent>;
+          <div key={index} className={`message ${msg.sender}`}>
+            <CodeOrExplanationComponent sender={msg.sender} message={msg.message} ></CodeOrExplanationComponent>
           </div>
         ))}
       </div>
@@ -109,22 +108,7 @@ async function generateText(prompt) {
 function CodeOrExplanationComponent({sender, message}) {
     if (sender === "chatbot-code") {
         let container_id = "p5container" + Math.random().toString(36).substring(7);
-        let test_code = `
-            let x = 50;
-            let y = 50;
-
-            function setup() {
-              let canvas = createCanvas(400, 400);
-              canvas.parent("p5-container"); // Attach to div with id="p5-container"
-            }
-
-            function draw() {
-              background(220);
-              ellipse(x, y, 50, 50);
-              x += 1; // Move the circle
-            }`;
         return <div>
-            <p>Code:</p>
             <P5Wrapper scriptContent={message} container_id={container_id}></P5Wrapper>
             </div>;
     }

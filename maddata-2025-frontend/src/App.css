@@ -1,5 +1,9 @@
 .App {
   text-align: center;
+  margin-top: 2rem;
+  background-color:  #686963;
+  margin-left: 2rem;
+  margin-right: 2rem;
 }
 
 .App-logo {
@@ -35,4 +39,63 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+body {
+  background-color:  #000000
+}
+
+header {
+  margin-bottom: 2rem;
+}
+
+.chat-window {
+  height: 500px;
+  overflow-y: auto;
+  border: 1px solid 	#db0000;
+  padding: 10px;
+  margin-bottom: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  background-color: #564d4d;
+  border-radius: 8px;
+}
+
+.button {
+  color: #831010;
+}
+
+.padding {
+  margin-left: 1rem;
+}
+
+.message {
+  padding: 10px 20px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.form {
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
+.user {
+  background-color: #f0f0f0;
+  align-self: flex-start;
+}
+
+.chatbot-code {
+  background-color: #831010;
+  color: #fafafa;
+  align-self: flex-end;
+}
+.chatbot-explanation {
+  background-color: #831010;
+  color: #fafafa;
+  align-self: flex-end;
+}
+
+footer {
+  margin-top: 2rem;
 }
