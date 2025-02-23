@@ -1,11 +1,12 @@
 // create chat modal comoponent that has input for answer and then calls an api to get the response and then displays it
 
-import { useState } from "react";
+import { useState, useRef} from "react";
 
 import React from "react";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import P5Wrapper from "./p5-sketch";
+
     
 const genAI = new GoogleGenerativeAI("AIzaSyDPvEGpuaIgytJiK0cgAjUpuRTEOKvVPJg"); // Replace YOUR_API_KEY with your actual API key
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -17,7 +18,7 @@ const ChatModal = () => {
   const handleInputChange = (e) => {
     setInputText(e.target.value);
   };
-
+  const inputRef = useRef(null);
 
 
 async function generateText(prompt) {
@@ -28,6 +29,8 @@ async function generateText(prompt) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const inputText = inputRef.current.value; 
+    inputRef.current.value = "";
     if (!inputText.trim()) return;
 
     // Add user message to chat history
@@ -82,11 +85,15 @@ async function generateText(prompt) {
     }
   };
 
+          //placeholder="Type your message..."
+          //value={inputText}
+          //clearOnEscape
+          //onChange={handleInputChange}
   return (
     <main>
       <div className="chat-window">
         {chatHistory.map((msg, index) => (
-          <div key={index} className={`message ${msg.sender}`}>
+          <div key={index} align="right" className={`message ${msg.sender}`}>
             <CodeOrExplanationComponent sender={msg.sender} message={msg.message} ></CodeOrExplanationComponent>
           </div>
         ))}
@@ -94,12 +101,12 @@ async function generateText(prompt) {
 
       <div className="input-container">
       <form onSubmit={handleSubmit} className="form">
-        <input
-          placeholder="Type your message..."
-          value={inputText}
-          clearOnEscape
-          onChange={handleInputChange}
-        />
+        <label>Type Here:
+
+        <input ref={inputRef} clearOnEscape></input>
+        
+        </label>
+         
         <div style={{paddingBottom:'8px'}}></div>
         <button className="submit-button">Submit</button>
       </form>
@@ -111,13 +118,17 @@ async function generateText(prompt) {
 function CodeOrExplanationComponent({sender, message}) {
     if (sender === "chatbot-code") {
         let container_id = "p5container" + Math.random().toString(36).substring(7);
-        return <div>
+        return <div class="center">
             <P5Wrapper scriptContent={message} container_id={container_id}></P5Wrapper>
             </div>;
     }
-    else {
-        return <p>{message}</p>
+    else if (sender === "chatbot-explanation") {
+        return <p >{message}</p>
     }
+    else {
+      return <p className={"right"}>{message}</p>
+    }
+   
 }
 
 export default ChatModal;
